@@ -108,92 +108,6 @@ function fill_cell(e)
   }
 }
 
-let isFilling = false
-
-function rebuildGlyphTable (table)
-{
-  table.innerHTML = null
-  const jmax = ftdt.maxBaseline + 1 - ftdt.minUnderBaseline
-  const imin = Math.min(0, table.xo)
-  const imax = Math.max(table.xadv, table.w + table.xo)
-  for (let j = 0; j < jmax; ++j) {
-    const row = element('div', 'row')
-    for (let i = imin; i <= imax; ++i) {
-      const cell = element('div', 'cell')
-      if (table.showGrid) {
-        if (i && !(i & 0x07)) addClass(cell, 'x8'); else
-        if (i && !(i & 0x03)) addClass(cell, 'x4');
-        if (j && !(j & 0x07)) addClass(cell, 'y8'); else
-        if (j && !(j & 0x03)) addClass(cell, 'y4');
-      }
-      on(cell, 'mousedown', (e)=>{ isFilling = true; fill_cell(e) })
-      on(cell, 'mouseup', (e)=>{ isFilling = false })
-      on(cell, 'mouseenter', (e)=>{ if (isFilling) fill_cell(e) })
-      cell.x = i
-      cell.y = j
-      if (i === 0 && j === 0) {
-        table.before_xoffset = cell
-      }
-      if (j === 0 && i === table.xadv) {
-        table.before_xadvance = cell
-      }
-      setPixelColor(table, cell)
-      append(row, cell)
-    }
-    append(table, row)
-  }
-
-  return append(
-    table,
-    (()=>{ let b = element('div', 'limit'); b.style.left = table.before_xoffset.offsetLeft - 1; return b})(),
-    (()=>{ let b = element('div', 'limit'); b.style.left = table.before_xadvance.offsetLeft - 1; return b})(),
-    (()=>{ let b = element('div', 'baseline'); b.style.top = (ftdt.maxBaseline + 1) * 10 - 1; return b})()
-  )
-}
-
-let inteId = undefined
-
-function upDownButton (name, on_click, color, width)
-{
-  return append(
-    (()=>{ let b = element('div', 'ui mini compact buttons'); b.style.display = "inline"; b.style.margin = '1px'; return b})(),
-    (()=>{
-      let b = element('button', 'ui compact button ' + color, '-'); b.incdir = -1;
-      on(b, 'click', on_click);
-      on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(on_click, 100, e) });
-      on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
-      on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
-      return b
-    })(),
-    (()=>{ let b = element('button', 'ui compact disabled button ' + color, name); b.style.width = width; return b})(),
-    (()=>{
-      let b = element('button', 'ui compact button ' + color, '+'); b.incdir = +1;
-      on(b, 'click', on_click);
-      on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(on_click, 100, e) });
-      on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
-      on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
-      return b
-    })()
-  )
-}
-
-function checkButton (name, func, color, width, disabled)
-{
-  return append(
-    (()=>{let b = element('span', 'ui mini compact'); b.style.margin = '1px'; return b})(),
-    append(
-      (()=>{let b = element('label', 'ui ' + color + ' label', name); b.disabled = true; b.style.width = width; return b})(),
-      (()=>{
-        let b = element('input');
-        on(b, 'change', (e)=>{ let t = eTargetGlyph(e); t.dis = 1 - t.dis; $(t).fadeTo('fast', 1 - 0.9 * t.dis); return false});
-        b.type = 'checkbox';
-        if (disabled) b.checked = 'checked';
-        return b}
-      )()
-    )
-  )
-}
-
 function pushAct(t, act, prev, next)
 {
   t.undo.push([act, prev, next, arguments[4], arguments[5]])
@@ -362,6 +276,92 @@ function showGrid(e)
   const table = eTargetGlyph(e)
   table.showGrid = 1 - table.showGrid
   rebuildGlyphTable(table)
+}
+
+let isFilling = false
+
+function rebuildGlyphTable (table)
+{
+  table.innerHTML = null
+  const jmax = ftdt.maxBaseline + 1 - ftdt.minUnderBaseline
+  const imin = Math.min(0, table.xo)
+  const imax = Math.max(table.xadv, table.w + table.xo)
+  for (let j = 0; j < jmax; ++j) {
+    const row = element('div', 'row')
+    for (let i = imin; i <= imax; ++i) {
+      const cell = element('div', 'cell')
+      if (table.showGrid) {
+        if (i && !(i & 0x07)) addClass(cell, 'x8'); else
+        if (i && !(i & 0x03)) addClass(cell, 'x4');
+        if (j && !(j & 0x07)) addClass(cell, 'y8'); else
+        if (j && !(j & 0x03)) addClass(cell, 'y4');
+      }
+      on(cell, 'mousedown', (e)=>{ isFilling = true; fill_cell(e) })
+      on(cell, 'mouseup', (e)=>{ isFilling = false })
+      on(cell, 'mouseenter', (e)=>{ if (isFilling) fill_cell(e) })
+      cell.x = i
+      cell.y = j
+      if (i === 0 && j === 0) {
+        table.before_xoffset = cell
+      }
+      if (j === 0 && i === table.xadv) {
+        table.before_xadvance = cell
+      }
+      setPixelColor(table, cell)
+      append(row, cell)
+    }
+    append(table, row)
+  }
+
+  return append(
+    table,
+    (()=>{ let b = element('div', 'limit'); b.style.left = table.before_xoffset.offsetLeft - 1; return b})(),
+    (()=>{ let b = element('div', 'limit'); b.style.left = table.before_xadvance.offsetLeft - 1; return b})(),
+    (()=>{ let b = element('div', 'baseline'); b.style.top = (ftdt.maxBaseline + 1) * 10 - 1; return b})()
+  )
+}
+
+let inteId = undefined
+
+function upDownButton (name, on_click, color, width)
+{
+  return append(
+    (()=>{ let b = element('div', 'ui mini compact buttons'); b.style.display = "inline"; b.style.margin = '1px'; return b})(),
+    (()=>{
+      let b = element('button', 'ui compact button ' + color, '-'); b.incdir = -1;
+      on(b, 'click', on_click);
+      on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(on_click, 100, e) });
+      on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
+      on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
+      return b
+    })(),
+    (()=>{ let b = element('button', 'ui compact disabled button ' + color, name); b.style.width = width; return b})(),
+    (()=>{
+      let b = element('button', 'ui compact button ' + color, '+'); b.incdir = +1;
+      on(b, 'click', on_click);
+      on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(on_click, 100, e) });
+      on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
+      on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
+      return b
+    })()
+  )
+}
+
+function checkButton (name, func, color, width, disabled)
+{
+  return append(
+    (()=>{let b = element('span', 'ui mini compact'); b.style.margin = '1px'; return b})(),
+    append(
+      (()=>{let b = element('label', 'ui ' + color + ' label', name); b.disabled = true; b.style.width = width; return b})(),
+      (()=>{
+        let b = element('input');
+        on(b, 'change', (e)=>{ let t = eTargetGlyph(e); t.dis = 1 - t.dis; $(t).fadeTo('fast', 1 - 0.9 * t.dis); return false});
+        b.type = 'checkbox';
+        if (disabled) b.checked = 'checked';
+        return b}
+      )()
+    )
+  )
 }
 
 function makeGlyphItem (code, bpp, w, h, xadv, xo, yo, tb, disabled)
