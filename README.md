@@ -4,7 +4,7 @@
 
 ## Font-Customizer
 
-  * A handy tool for manipulating fonts.
+  * A handy tool for manipulating fonts, developed under chrome.
 
   * With its help, you can create new fonts or modify existing ones (input and output are in TSD format).
 
@@ -28,7 +28,7 @@
 
 ## font_grabger
 
-  * Javascript tool for capturing fonts from other libraries (still under construction).
+  * Javascript tool for capturing fonts from other libraries (still under construction), developed under chrome.
 
 ## a2tsd
 
