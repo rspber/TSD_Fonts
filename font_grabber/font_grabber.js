@@ -302,6 +302,7 @@ function proc_file()
     }
   }
 */
+/*
   // TFT_eSPI
   {
     const widtbl = extract_array(data, 0, /\w*\s*const\s+\w*\s*\w*\s*widtbl_(\w+)\s*\[(\d*)\]\s*\=(.|\n)*?\{/)
@@ -357,6 +358,9 @@ function proc_file()
           bitmap = bitmap.slice(1, bitmap.length-1)
           bpp = 2
         }
+
+        !!! unknown bitmap format !!!
+
         tb.push(tsd_glyph('', code, bpp, ver, w, h, xadv, 0, baseline, bitmap))
       }
       if (code > code0) {
@@ -368,7 +372,7 @@ function proc_file()
       return
     }
   }
-
+*/
 }
 
 function saveFile()
