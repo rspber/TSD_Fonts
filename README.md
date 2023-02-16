@@ -26,7 +26,7 @@
 
   * Fonts can be converted to any gray scale (bpp parameter) in the form of packed bitmaps or not (ver parameter).
 
-## font_grabger
+## font_grabber
 
   * Javascript tool for capturing fonts from other libraries (still under construction), developed under chrome.
 
