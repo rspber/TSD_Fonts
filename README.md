@@ -22,7 +22,7 @@
 
 ## Create_font
 
-  * Two options of the same: processing or java.
+  * Two options of the same: processing or eclipse.
 
   * Fonts can be converted to any gray scale (bpp parameter) in the form of packed bitmaps or not (ver parameter).
 
