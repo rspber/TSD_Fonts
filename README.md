@@ -28,7 +28,7 @@
 
 ## font_grabber
 
-  * Javascript tool for capturing fonts from other libraries (still under construction), developed under chrome.
+  * Javascript tool for capturing fonts from other libraries (still under development), developed under chrome.
 
 ## a2tsd
 
