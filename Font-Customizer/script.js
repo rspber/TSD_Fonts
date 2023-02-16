@@ -1,17 +1,17 @@
 /*
-  Font-Customizer 3.0
+  Font-Customizer 3.1
 
   Copyright (c) 2023, rspber (https://github.com/rspber)
   All rights reserved
 
 */
 
-function resizePixels (table)
+function resizePixels (t)
 {
-  const pixels = table.tb
+  const pixels = t.tb
 
-  let w = table.w
-  let h = table.h
+  let w = t.w
+  let h = t.h
 
   if (h < pixels.length) {
     pixels.length = h
@@ -31,7 +31,7 @@ function resizePixels (table)
     }
   }
 
-  rebuildGlyphTable(table);
+  rebuildGlyphTable(t);
 }
 
 function eTargetGlyph(e)
@@ -48,11 +48,11 @@ function eTargetGlyph(e)
   }
 }
 
-function getPixelColor(table, cell)
+function getPixelColor(t, cell)
 {
-  const x = cell.x - table.xo;
-  const y = cell.y - (ftdt.maxBaseline + table.yo)
-  const pixels = table.tb
+  const x = cell.x - t.xo;
+  const y = cell.y - (ftdt.maxBaseline + t.yo)
+  const pixels = t.tb
 
   if (y >= 0 && y < pixels.length) {
     const pxrow = pixels[y]
@@ -70,11 +70,11 @@ function setBackground(cell, v)
   cell.style.backgroundColor = 'rgb(' + c + ',' + cc + ',' + c + ')'
 }
 
-function setPixelColor(table, cell, fill)
+function setPixelColor(t, cell, fill)
 {
-  const x = cell.x - table.xo;
-  const y = cell.y - (ftdt.maxBaseline + table.yo)
-  const pixels = table.tb
+  const x = cell.x - t.xo;
+  const y = cell.y - (ftdt.maxBaseline + t.yo)
+  const pixels = t.tb
 
   if (y >= 0 && y < pixels.length) {
     const pxrow = pixels[y]
@@ -84,7 +84,7 @@ function setPixelColor(table, cell, fill)
       addClass(cell, 'fill')
       if (!(fill === undefined || fill === false)) pxrow[x] = fill
       setBackground(cell, pxrow[x])
-      if (cell.x >= table.xadv || cell.x < Math.max(0, table.xo)) {
+      if (cell.x >= t.xadv || cell.x < Math.max(0, t.xo)) {
         addClass(cell, 'over')
       }
       return prev
@@ -99,11 +99,11 @@ function setPixelColor(table, cell, fill)
 function fill_cell(e)
 {
   if (hasClass(e.target, 'fill')) {
-    const table = eTargetGlyph(e)
-    if (d_palette.fill && d_palette.div.table == table) {
+    const t = eTargetGlyph(e)
+    if (d_palette.fill && d_palette.div.table == t) {
       const v = d_palette.fill.fill
-      const prev = setPixelColor(table, e.target, v)
-      pushAct(table, 'set', prev, v, e.target.x, e.target.y)
+      const prev = setPixelColor(t, e.target, v)
+      pushAct(t, 'set', prev, v, e.target.x, e.target.y)
     }
   }
 }
@@ -192,8 +192,8 @@ function redo(e)
 function setupPaletteFill(e)
 {
   d_palette.fill = e.target
-  const table = d_palette.div.table
-  setBackground(e.target.parentElement.parentElement.previousSibling.firstChild, e.target.fill, table.bpp)  // for seeing only
+  const t = d_palette.div.table
+  setBackground(e.target.parentElement.parentElement.previousSibling.firstChild, e.target.fill, t.bpp)  // for seeing only
 }
 
 function makePalette(bpp)
@@ -225,6 +225,8 @@ function detachPalette(input)
     d_palette.checkInput.parentElement.parentElement.div.innerHTML = null
     if (input != d_palette.checkInput) {
       d_palette.checkInput.checked = false
+      d_palette.checkInput.nextSibling.disabled = true
+      d_palette.checkInput.nextSibling.nextSibling.disabled = true
     }
     d_palette.checkInput = null
     d_palette.fill = null
@@ -249,48 +251,125 @@ function appendPalette(input)
 
 function attachPalette(e)
 {
-  const table = eTargetGlyph(e)
-  if (!d_palette.div || d_palette.div.table.bpp != table.bpp) {
-    d_palette.div = makePalette(table.bpp)
+  const t = eTargetGlyph(e)
+  if (!d_palette.div || d_palette.div.table.bpp != t.bpp) {
+    d_palette.div = makePalette(t.bpp)
   }
   detachPalette(e.target)
   appendPalette(e.target)
-  d_palette.div.table = table
+  d_palette.div.table = t
+  e.target.nextSibling.disabled = !e.target.checked
+  e.target.nextSibling.nextSibling.disabled = !e.target.checked
 }
 
-function changeDensity(e)
+function changeDensity(t, input, v)
 {
-  const input = e.target.previousSibling
+  v = t.bpp + v
+  if (v < 0 || v > 3) {
+    return
+  }
   if (input.checked) {
     detachPalette(input)
-    const table = eTargetGlyph(e)
-    table.bpp = (table.bpp + 1) % 4
-    d_palette.div = makePalette(table.bpp)
+    t.bpp = v
+    d_palette.div = makePalette(t.bpp)
     appendPalette(input)
-    d_palette.div.table = table
+    d_palette.div.table = t
   }
+}
+
+function incDensity(e)
+{
+  changeDensity(eTargetGlyph(e), e.target.previousSibling, +1)
+}
+
+function decDensity(e)
+{
+  changeDensity(eTargetGlyph(e), e.target.previousSibling.previousSibling, -1)
 }
 
 function showGrid(e)
 {
-  const table = eTargetGlyph(e)
-  table.showGrid = 1 - table.showGrid
-  rebuildGlyphTable(table)
+  const t = eTargetGlyph(e)
+  t.showGrid = 1 - t.showGrid
+  rebuildGlyphTable(t)
+}
+
+function tr2td(label, value)
+{
+  return append(
+    element('tr'),
+    element('td', '', label),
+    (()=>{ let d = element('td', '', value); d.style.float = 'right'; return d })()
+  )
+}
+
+function tr4td(l1, v1, l2, v2)
+{
+  return append(
+    element('tr'),
+    element('td', '', l1),
+    (()=>{ let d = element('td', '', v1); d.style.float = 'right'; return d })(),
+    element('td', '', l2),
+    (()=>{ let d = element('td', '', v2); d.style.float = 'right'; return d })()
+  )
+}
+
+function glyph_info(t)
+{
+  return append(
+    (()=>{ let d = element('table'); d.style.width = '100%'; d.style.fontSize = '0.8rem';  return d })(),
+    tr4td('Rows', t.h, 'Cols', t.w),
+    tr4td('Base',  t.yo, 'XAddv', t.xadv),
+    tr4td('MaxBase', ftdt.maxBaseline, 'XOff', t.xo),
+    tr4td('Baseline', ftdt.minUnderBaseline, 'Height', ftdt.font_height),
+  )
+}
+
+function showGlyphInfo(e)
+{
+  const t = eTargetGlyph(e)
+  if (t.info) {
+    remove(e.target.parentElement.parentElement, t.info)
+    t.info = null
+    return
+  }
+  append(
+    e.target.parentElement.parentElement,
+    append(
+      (()=>{
+        let d = element('div');
+        d.style.zIndex = '1';
+        d.style.position = 'absolute';
+        d.style.top = '40px';
+        d.style.width = '150px';
+        d.style.backgroundColor = 'white';
+        d.style.padding = '2px';
+        d.style.boxShadow = '0px 1px 5px rgba(0, 0, 0, 0.35)';
+        return t.info = d
+      })(),
+      glyph_info(t)
+    )
+  )
 }
 
 let isFilling = false
 
-function rebuildGlyphTable (table)
+function rebuildGlyphTable (t)
 {
-  table.innerHTML = null
+  if (t.info) {
+    t.info.innerHTML= null
+    append(t.info, glyph_info(t))
+  }
+
+  t.innerHTML = null
   const jmax = ftdt.maxBaseline + 1 - ftdt.minUnderBaseline
-  const imin = Math.min(0, table.xo)
-  const imax = Math.max(table.xadv, table.w + table.xo)
+  const imin = Math.min(0, t.xo)
+  const imax = Math.max(t.xadv, t.w + t.xo)
   for (let j = 0; j < jmax; ++j) {
     const row = element('div', 'row')
     for (let i = imin; i <= imax; ++i) {
       const cell = element('div', 'cell')
-      if (table.showGrid) {
+      if (t.showGrid) {
         if (i && !(i & 0x07)) addClass(cell, 'x8'); else
         if (i && !(i & 0x03)) addClass(cell, 'x4');
         if (j && !(j & 0x07)) addClass(cell, 'y8'); else
@@ -302,21 +381,21 @@ function rebuildGlyphTable (table)
       cell.x = i
       cell.y = j
       if (i === 0 && j === 0) {
-        table.before_xoffset = cell
+        t.before_xoffset = cell
       }
-      if (j === 0 && i === table.xadv) {
-        table.before_xadvance = cell
+      if (j === 0 && i === t.xadv) {
+        t.before_xadvance = cell
       }
-      setPixelColor(table, cell)
+      setPixelColor(t, cell)
       append(row, cell)
     }
-    append(table, row)
+    append(t, row)
   }
 
   return append(
-    table,
-    (()=>{ let b = element('div', 'limit'); b.style.left = table.before_xoffset.offsetLeft - 1; return b})(),
-    (()=>{ let b = element('div', 'limit'); b.style.left = table.before_xadvance.offsetLeft - 1; return b})(),
+    t,
+    (()=>{ let b = element('div', 'limit'); b.style.left = t.before_xoffset.offsetLeft - 1; return b})(),
+    (()=>{ let b = element('div', 'limit'); b.style.left = t.before_xadvance.offsetLeft - 1; return b})(),
     (()=>{ let b = element('div', 'baseline'); b.style.top = (ftdt.maxBaseline + 1) * 10 - 1; return b})()
   )
 }
@@ -410,13 +489,15 @@ function makeGlyphItem (code, bpp, w, h, xadv, xo, yo, tb, disabled)
           append(
             (()=>{ let b = element('span', ''); b.style.display = 'flex'; return b })(),
             (()=>{ let b = element('input', ''); b.style.marginRight = '5px'; b.type = 'checkbox'; on(b, 'click', attachPalette); return b })(),
-            (()=>{ let b = element('button', ''); on(b, 'click', changeDensity); return b })()
+            (()=>{ let b = element('button', 'pico-btn', '+'); on(b, 'click', incDensity); b.disabled = true; return b })(),
+            (()=>{ let b = element('button', 'pico-btn', '\u2010'); on(b, 'click', decDensity); b.disabled = true; return b })(),
+            (()=>{ let b = element('button', 'pico-btn', '?'); on(b, 'click', showGlyphInfo); return b })()
           ),
           (()=>{ let b = element('div', 'palette'); b.style.display = 'flex'; b.style.marginTop = '10px'; return divp.div = b })()
         ),
         append(
           (()=>{ let b = element('span', ''); b.style.display = 'flex'; return b })(),
-          (()=>{ let b = element('button', 'pico-btn', '+'); b.style.marginRight='10px'; on(b, 'click', showGrid); return b })(),
+          (()=>{ let b = element('button', 'pico-btn', '\u25a1'); b.style.marginRight='10px'; on(b, 'click', showGrid); return b })(),
           (()=>{
             let b = element('button', 'pico-btn', '<'); b.disabled=true;
             on(b, 'click', undo);
@@ -437,13 +518,19 @@ function makeGlyphItem (code, bpp, w, h, xadv, xo, yo, tb, disabled)
       )
     ),
     append(
-      (()=>{ let b = element('div', 'ui bottom attached warning message'); b.style.display = 'block'; b.style.textAlign = 'center'; return b })(),
-      upDownButton('Rows', (e)=>{ actv(eTargetGlyph(e), 'rows', e.target.incdir); return false}, 'purple', 50),
-      upDownButton('Cols', (e)=>{ actv(eTargetGlyph(e), 'cols', e.target.incdir); return false}, 'violet', 50),
-      upDownButton('Base', (e)=>{ actv(eTargetGlyph(e), 'base', e.target.incdir); return false}, 'green', 50),
-      upDownButton('XOff', (e)=>{ actv(eTargetGlyph(e), 'xoff', e.target.incdir); return false}, 'blue', 50),
-      upDownButton('XAdv', (e)=>{ actv(eTargetGlyph(e), 'xadv', e.target.incdir); return false}, 'teal', 50),
-      checkButton('Disable', 'dis', 'yellow', 110, disabled)
+      (()=>{ let b = element('div', 'ui bottom attached warning message'); b.style.display = 'flex'; b.style.textAlign = 'center'; return b })(),
+      append(
+        element('div'),
+        upDownButton('Rows', (e)=>{ actv(eTargetGlyph(e), 'rows', e.target.incdir); return false}, 'purple', 50),
+        upDownButton('Base', (e)=>{ actv(eTargetGlyph(e), 'base', e.target.incdir); return false}, 'green', 50),
+        checkButton('Disable', 'dis', 'yellow', 110, disabled)
+      ),
+      append(
+        (()=>{ let b = element('div'); b.style.marginLeft = '20px'; return b })(),
+        upDownButton('Cols', (e)=>{ actv(eTargetGlyph(e), 'cols', e.target.incdir); return false}, 'purple', 50),
+        upDownButton('XAdv', (e)=>{ actv(eTargetGlyph(e), 'xadv', e.target.incdir); return false}, 'orange', 50),
+        upDownButton('XOff', (e)=>{ actv(eTargetGlyph(e), 'xoff', e.target.incdir); return false}, 'green', 50)
+      )
     )
   )
 }
@@ -761,24 +848,21 @@ function do_create()
     append(
       element('div', "content"),
       append(
-        element('form', "ui form"),
-        append(
-          element('div', "ui right labeled input"),
-          element('a', "ui label", "Font name"),
-          (()=>{ let d = element('input'); d.type="text"; d.value="Default"; d.placeholder="Name of the new font"; return d_create.name=d})()
-        ),
-        element('p', '', "Font height in pixels for all characters."),
-        append(
-          element('div', "ui right labeled input"),
-          element('a', "ui label", "Font size"),
-          (()=>{ let d = element('input'); d.style.width="150px"; d.type="number"; d.min=1; d.value="12"; d.placeholder="in pt e.g. 12";
-            on(d, 'keyup', function(){ setval(d_create.height, Math.round(ival(this)/0.41)) });
-            on(d, 'change', function(){ setval(d_create.height, Math.round(ival(this)/0.41)) });
-            return d_create.size=d
-          })(),
-          element('a', "ui label", "Font height"),
-          (()=>{ let d = element('input'); d.style.width="150px"; d.type="number"; d.min=1; d.value="28"; d.placeholder="in pixels e.g. 28"; return d_create.height=d})()
-        )
+        element('div', "ui right labeled input"),
+        element('a', "ui label", "Font name"),
+        (()=>{ let d = element('input'); d.type="text"; d.value="Default"; d.placeholder="Name of the new font"; return d_create.name=d})()
+      ),
+      element('p', '', "Font height in pixels for all characters."),
+      append(
+        element('div', "ui right labeled input"),
+        element('a', "ui label", "Font size"),
+        (()=>{ let d = element('input'); d.style.width="150px"; d.type="number"; d.min=1; d.value="12"; d.placeholder="in pt e.g. 12";
+          on(d, 'keyup', function(){ setval(d_create.height, Math.round(ival(this)/0.41)) });
+          on(d, 'change', function(){ setval(d_create.height, Math.round(ival(this)/0.41)) });
+          return d_create.size=d
+        })(),
+        element('a', "ui label", "Font height"),
+        (()=>{ let d = element('input'); d.style.width="150px"; d.type="number"; d.min=1; d.value="28"; d.placeholder="in pixels e.g. 28"; return d_create.height=d})()
       ),
       element('p', '', "UTF-8 (hex coded) starting characters e.g.: C4 - for latin A, E5 AD - for some CJKs."),
       append(

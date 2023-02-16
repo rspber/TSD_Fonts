@@ -26,6 +26,14 @@ function append(d)
   return d
 }
 
+function remove(d)
+{
+  for (let i = 1; i < arguments.length; ++i) {
+    d.removeChild(arguments[i])
+  }
+  return d
+}
+
 function hasClass(e, c)
 {
   return e.classList.contains(c)
