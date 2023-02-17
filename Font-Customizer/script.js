@@ -100,7 +100,7 @@ function fill_cell(e)
 {
   if (hasClass(e.target, 'fill')) {
     const t = eTargetGlyph(e)
-    if (d_palette.fill && d_palette.div.table == t) {
+    if (!t.dis && d_palette.fill && d_palette.div.table == t) {
       const v = d_palette.fill.fill
       const prev = setPixelColor(t, e.target, v)
       pushAct(t, 'set', prev, v, e.target.x, e.target.y)
@@ -118,6 +118,9 @@ function pushAct(t, act, prev, next)
 
 function act_(t, act, v, x, y)
 {
+  if (t.dis) {
+    return
+  }
   switch (act) {
     case 'rows':
       t.h += v
@@ -170,7 +173,7 @@ function actv(t, act, v)
 function undo(e)
 {
   const t = eTargetGlyph(e)
-  if (t.undoidx > 0) {
+  if (!t.dis && t.undoidx > 0) {
     const u = t.undo[--t.undoidx]
     act_(t, u[0], u[1], u[3], u[4])
     t.undoBtn.disabled = t.undoidx <= 0
@@ -181,7 +184,7 @@ function undo(e)
 function redo(e)
 {
   const t = eTargetGlyph(e)
-  if (t.undoidx < t.undo.length) {
+  if (!t.dis && t.undoidx < t.undo.length) {
     const u = t.undo[t.undoidx++]
     act_(t, u[0], u[2], u[3], u[4])
     t.undoBtn.disabled = false
@@ -290,8 +293,10 @@ function decDensity(e)
 function showGrid(e)
 {
   const t = eTargetGlyph(e)
-  t.showGrid = 1 - t.showGrid
-  rebuildGlyphTable(t)
+  if (!t.dis) {
+    t.showGrid = 1 - t.showGrid
+    rebuildGlyphTable(t)
+  }
 }
 
 function tr2td(label, value)
