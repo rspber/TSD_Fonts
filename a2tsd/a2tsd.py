@@ -9,7 +9,7 @@
 #  - place Adafruit's fonts in subdirectory Fonts
 #  - create empty subdirectory TSDFonts
 #  - run a2tsd.py c
-#  - or `run a2tsd.py` for not to compress bitmaps
+#  - or `run a2tsd.py` for not to compress fonts bitmaps
 #  - then place the new fonts in tsdesktop/gfx/Fonts directory
 
 import os, sys, re
