@@ -10,7 +10,7 @@
 #  - create empty subdirectory TSDFonts
 #  - run a2tsd.py c
 #  - or `run a2tsd.py` for not to compress bitmaps
-#  - then place the new fonts in tsdesktop/GFX/Fonts directory
+#  - then place the new fonts in tsdesktop/gfx/Fonts directory
 
 import os, sys, re
 import tsdfont
