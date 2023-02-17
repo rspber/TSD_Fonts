@@ -408,8 +408,7 @@ function upDownButton (name, on_click, color, width)
     (()=>{ let b = element('div', 'ui mini compact buttons'); b.style.display = "inline"; b.style.margin = '1px'; return b})(),
     (()=>{
       let b = element('button', 'ui compact button ' + color, '-'); b.incdir = -1;
-      on(b, 'click', on_click);
-      on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(on_click, 100, e) });
+      on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(on_click, 100, e); on_click(e) });
       on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
       on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
       return b
@@ -417,8 +416,7 @@ function upDownButton (name, on_click, color, width)
     (()=>{ let b = element('button', 'ui compact disabled button ' + color, name); b.style.width = width; return b})(),
     (()=>{
       let b = element('button', 'ui compact button ' + color, '+'); b.incdir = +1;
-      on(b, 'click', on_click);
-      on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(on_click, 100, e) });
+      on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(on_click, 100, e); on_click(e) });
       on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
       on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
       return b
@@ -500,16 +498,14 @@ function makeGlyphItem (code, bpp, w, h, xadv, xo, yo, tb, disabled)
           (()=>{ let b = element('button', 'pico-btn', '\u25a1'); b.style.marginRight='10px'; on(b, 'click', showGrid); return b })(),
           (()=>{
             let b = element('button', 'pico-btn', '<'); b.disabled=true;
-            on(b, 'click', undo);
-            on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(undo, 50, e) });
+            on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(undo, 50, e); undo(e) });
             on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
             on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
             return table.glyph.undoBtn=b
           })(),
           (()=>{
             let b = element('button', 'pico-btn', '>'); b.disabled=true;
-            on(b, 'click', redo);
-            on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(redo, 50, e) });
+            on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(redo, 50, e); redo(e) });
             on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
             on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
             return table.glyph.redoBtn=b
