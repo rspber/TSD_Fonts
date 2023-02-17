@@ -48,7 +48,7 @@ function eTargetGlyph(e)
   }
 }
 
-function getPixelColor(t, cell)
+function getPixel(t, cell)
 {
   const x = cell.x - t.xo;
   const y = cell.y - (ftdt.maxBaseline + t.yo)
@@ -60,7 +60,6 @@ function getPixelColor(t, cell)
       return pxrow[x]
     }
   }
-  return 0
 }
 
 function setBackground(cell, v)
@@ -205,13 +204,14 @@ function makePalette(bpp)
   if (bpp == 1) { h = 4; w = 1; m = 85 } else
   if (bpp == 2) { h = 16; w = 1; m = 17 } else
                 { h = 16; w = 16; m = 1 }
-  const p = element('div');
+  const p = element('table');
   p.style.width = 'max-content' // compact
-  p.style.position = 'relative'
+  p.style.borderSpacing = '0px'
+//  p.style.position = 'relative'
   for (let j = h; --j >= 0; ) {
-    const row = element('div', 'row')
+    const row = element('tr', 'row')
     for (let i = w; --i >= 0; ) {
-      let cell = element('div', 'cell')
+      let cell = element('td', 'cell')
       on(cell, 'click', setupPaletteFill)
       cell.fill = (j * w + i) * m
       setBackground(cell, cell.fill)
@@ -220,6 +220,49 @@ function makePalette(bpp)
     append(p, row)
   }
   return p
+}
+
+function mark_palette(e)
+{
+  if (hasClass(e.target, 'fill')) {
+    const t = eTargetGlyph(e)
+    if (d_palette.div && d_palette.div.table == t) {
+      let fill = getPixel(t, e.target)
+      if (fill > 0 && fill < 255) {
+        let n = 4
+        let b = 0xff
+        while (--n >= 0) {
+          let found = false
+          let color = 'red'
+          for (let row of d_palette.div.childNodes) {
+            for (let cell of row.childNodes) {
+              if ((cell.fill & b) == (fill & b)) {
+                cell.innerHTML = b == 0xff ? '\u26fd' : '\u2639'
+                found = true
+              }
+            }
+          }
+          if (found) break
+          b = b == 0xff ? 0xf0 : b == 0xf0 ? 0xc0 : 0x80
+        }
+      }
+    }
+  }
+}
+
+function unmark_palette(e)
+{
+  const c = e.target
+  if (hasClass(c, 'fill')) {
+    const t = eTargetGlyph(e)
+    if (d_palette.div && d_palette.div.table == t) {
+      for (let row of d_palette.div.childNodes) {
+        for (let cell of row.childNodes) {
+          cell.innerHTML = null
+        }
+      }
+    }
+  }
 }
 
 function detachPalette(input)
@@ -380,6 +423,8 @@ function rebuildGlyphTable (t)
         if (j && !(j & 0x07)) addClass(cell, 'y8'); else
         if (j && !(j & 0x03)) addClass(cell, 'y4');
       }
+      on(cell, 'mouseover', (e)=>{ mark_palette(e) })
+      on(cell, 'mouseout', (e)=>{ unmark_palette(e) })
       on(cell, 'mousedown', (e)=>{ isFilling = true; fill_cell(e) })
       on(cell, 'mouseup', (e)=>{ isFilling = false })
       on(cell, 'mouseenter', (e)=>{ if (isFilling) fill_cell(e) })

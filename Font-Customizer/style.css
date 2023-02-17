@@ -45,15 +45,23 @@ div.cell.x4 {
 }
 
 
-#glyphs div.palette div.cell:hover {
+div.palette div.cell {
+  border: 1px solid lightgrey;
+  width: 16px;
+  height: 16px;
+}
+
+#glyphs div.palette td.cell:hover {
   filter: invert(0.4);
 }
 
-#glyphs div.palette div.cell {
+#glyphs div.palette td.cell {
   border-bottom: 1px solid lightgrey;
   border-right: 1px solid lightgrey;
   width: 16px;
   height: 16px;
+  line-height: 0.6em;
+  color: red;
   display: inline-block;
   cursor: pointer;
 }
