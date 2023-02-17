@@ -233,7 +233,6 @@ function mark_palette(e)
         let b = 0xff
         while (--n >= 0) {
           let found = false
-          let color = 'red'
           for (let row of d_palette.div.childNodes) {
             for (let cell of row.childNodes) {
               if ((cell.fill & b) == (fill & b)) {
