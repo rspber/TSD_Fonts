@@ -401,6 +401,23 @@ function showGlyphInfo(e)
 
 let isFilling = false
 
+function cell_mousedown(e)
+{
+  isFilling = true;
+  fill_cell(e)
+}
+
+function cell_mouseup(e)
+{
+  isFilling = false
+}
+
+function cell_mouseenter(e)
+{
+  if (isFilling)
+    fill_cell(e)
+}
+
 function rebuildGlyphTable (t)
 {
   if (t.info) {
@@ -422,11 +439,11 @@ function rebuildGlyphTable (t)
         if (j && !(j & 0x07)) addClass(cell, 'y8'); else
         if (j && !(j & 0x03)) addClass(cell, 'y4');
       }
-      on(cell, 'mouseover', (e)=>{ mark_palette(e) })
-      on(cell, 'mouseout', (e)=>{ unmark_palette(e) })
-      on(cell, 'mousedown', (e)=>{ isFilling = true; fill_cell(e) })
-      on(cell, 'mouseup', (e)=>{ isFilling = false })
-      on(cell, 'mouseenter', (e)=>{ if (isFilling) fill_cell(e) })
+      on(cell, 'mouseover', mark_palette)
+      on(cell, 'mouseout', unmark_palette)
+      on(cell, 'mousedown', cell_mousedown)
+      on(cell, 'mouseup', cell_mouseup)
+      on(cell, 'mouseenter', cell_mouseenter)
       cell.x = i
       cell.y = j
       if (i === 0 && j === 0) {
