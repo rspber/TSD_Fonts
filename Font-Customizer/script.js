@@ -564,14 +564,14 @@ function makeGlyphItem (code, bpp, w, h, xadv, xo, yo, tb, disabled)
           (()=>{ let b = element('button', 'pico-btn', '\u25a1'); b.style.marginRight='10px'; on(b, 'click', showGrid); return b })(),
           (()=>{
             let b = element('button', 'pico-btn', '<'); b.disabled=true;
-            on(b, 'mousedown', (e)=>{ clearInterval(inteId); undo(e); inteId = setInterval(undo, 50, e) });
+            on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(undo, 50, e) });
             on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
             on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
             return table.glyph.undoBtn=b
           })(),
           (()=>{
             let b = element('button', 'pico-btn', '>'); b.disabled=true;
-            on(b, 'mousedown', (e)=>{ clearInterval(inteId); redo(e); inteId = setInterval(redo, 50, e) });
+            on(b, 'mousedown', (e)=>{ clearInterval(inteId); inteId = setInterval(redo, 50, e) });
             on(b, 'mouseup', (e)=>{ clearInterval(inteId) });
             on(b, 'mouseleave', (e)=>{ clearInterval(inteId) });
             return table.glyph.redoBtn=b
