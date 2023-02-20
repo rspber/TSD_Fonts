@@ -9,6 +9,11 @@ ver = 1;
 function setver(e)
 {
   ver = 1 - (e.target.checked ? 1 : 0)
+  clr_input_file()
+}
+
+function clr_input_file()
+{
   document.getElementById('load').value = null
   document.getElementById('data').textContent = null
 }
@@ -41,8 +46,24 @@ function store_content(font_name, tt, ff)
   document.getElementById('result').textContent = tt.join('\n') + '\n' + tsd_font(font_name, ff)
 }
 
+function fonts_select(e)
+{
+  const i = e.target.selectedIndex
+  if (i > 0) {
+    const opt = e.target[i]
+    store_content(opt.innerHTML, opt.tt, opt.ff)
+  }
+  else {
+    document.getElementById('tsdfname').textContent = null
+    document.getElementById('result').textContent = null
+  }
+}
+
 function proc_file()
 {
+  window.d_fonts = document.getElementById('fonts')
+  d_fonts.innerHTML = '<option>no items to select</option>'
+
   const data = this.result;
 
   // Adafruit GFX
@@ -132,6 +153,7 @@ function proc_file()
           tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tb.join('\n')))
         }
 
+        d_fonts.innerHTML = '<option>' + font_name + '</option>'
         store_content(font_name, tt, ff)
         return
       }
@@ -172,13 +194,14 @@ function proc_file()
           tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tb.join('\n')))
         }
 
+        d_fonts.innerHTML = '<option>' + font_name + '</option>'
         store_content(font_name, tt, ff)
         return
       }
     }
   }
 */
-/*
+
   // ILI9341_t3_font_t
   {
     function unpack_index(bitnx, bits_index)
@@ -187,18 +210,18 @@ function proc_file()
       let i = 0
       let b = 0
       let d = 0
-      let c = 0
+      let v = 0
       let j = 0
       while (i < bitnx.length) {
         if (!b) {
           d = bitnx[i++]
           b = 0x80
         }
-        c = (c << 1) | (d & b ? 1 : 0)
+        v = (v << 1) | (d & b ? 1 : 0)
         b >>= 1
         if (++j >= bits_index) {
-          nx.push(c)
-          c = 0
+          nx.push(v)
+          v = 0
           j = 0
         }
       }
@@ -209,12 +232,23 @@ function proc_file()
       bits: [],
       d: 0,
       b: 0,
-      j: 0,
-      get: function (n) {
-        let v = 0
-        for (let i = 0; i < n; ++i) {
+      i: 0,
+      tb: function (n) {
+        const tb = []
+        while (--n >= 0) {
           if (!this.b) {
-            this.d = this.bits[this.j++]
+            this.d = this.bits[this.i++]
+            this.b = 0x80
+          }
+          tb.push(this.d & this.b ? 1 : 0)
+          this.b >>= 1
+        }
+        return tb
+      },
+      ee: function (v, n) {
+        while (--n >= 0) {
+          if (!this.b) {
+            this.d = this.bits[this.i++]
             this.b = 0x80
           }
           v = (v << 1) | (this.d & this.b ? 1 : 0)
@@ -222,89 +256,158 @@ function proc_file()
         }
         return v
       },
-      rest: function () {
-        let bb = []
-        let v = 0
-        let n = 0
-        while (this.b || this.j < this.bits.length) {
-          if (!this.b) {
-            this.d = this.bits[this.j++]
-            this.b = 0x80
-          }
-          v = (v << 1) | (this.d & this.b ? 1 : 0)
-          this.b >>= 1
-          if (++n >= 8) {
-            bb.push(v)
-            v = 0
-            n = 0
-          }
-        }
-        return bb
+      uint: function (n) {
+        return this.ee(0, n)
+      },
+      sint: function (n) {
+        return this.ee(-this.ee(0, 1), n-1)
       },
       init: function (bits) {
         this.bits = bits;
-        this.d = this.b = this.j = 0
+        this.d = this.b = this.i = 0
       }
     }
 
+    function ubitmap(w, h) {
+
+      const bp = []
+      let u = 0
+      let j = 0
+
+      function append(tb1) {
+        for (let i = 0; i < tb1.length; ++i) {
+          u = (u << 1) | tb1[i]
+          if (++j >= 8) {
+            bp.push(u)
+            u = 0
+            j = 0
+          }
+        }
+      }
+
+      while (--h >= 0) {
+        const b = f.uint(1)
+        let n = b ? f.uint(3) + 2 : 1
+        let x = 0
+        do {
+          let xsize = w - x
+          if (xsize > 32) xsize = 32
+          const tb1 = f.tb(xsize)
+          for (let i = n; --i >= 0; ) {
+            append(tb1)
+          }
+          x += xsize;
+        } while (x < w);
+      }
+
+      if (j > 0) {
+        u <<= 8 - j
+        bp.push(u)
+        u = 0
+        j = 0
+      }
+      return bp
+    }
+
+    d_fonts.innerHTML = '<option></option>'
     let idx = 0
-    let da = extract_array(data, idx, /\w*\s*const\s+\w*\s*\w*\s*(\w+)_data\s*\[\]\s*\=\s*\{/)
-    if (da) {
-      let dx = extract_array(data, da.eidx, /\w*\s*const\s+\w*\s*\w*\s*(\w+)_index\s*\[\]\s*\=\s*\{/)
-      if (dx) {
-        let fo = extract_array(data, dx.eidx, /const\s+ILI9341_t3_font_t\s+(\w+)\s*\=\s*\{/, /\w+_\w+/g, '-1')
-        if (fo) {
-          document.getElementById('data').textContent = data
-          const font_name = da.fx[1]
-          // unpack index
-          let code0 = fo.data[5]
-          let code = code0
-          const font_height = fo.data[16]
-          const tt = []
-          const ff = []
-          let tg = []
-          let nx = unpack_index(dx.data, fo.data[9])
-          nx.push(da.data.length)
-          const to = nx.length - 1
-          for (i = 0; i < to; ++i) {
-            f.init(da.data.slice(nx[i], nx[i+1]))
-            const encoding = f.get(3)
-            const w = f.get(fo.data[10])
-            const h = f.get(fo.data[11])
-            const xo = f.get(fo.data[12])
-            const yo = - font_height + f.get(fo.data[13])
-            const delta = f.get(fo.data[14])
-            const xadv = delta
-            let bitmap = f.rest()
-
-            !!! unknown bits compression !!!
-
-//            if (ver == 0) {   // compress
-//              bitmap = font1_font0(bitmap, w, h)
-//            }
-            tg.push(tsd_glyph('', code++, 0, ver, w, h, xadv, xo, yo, bitmap))
-            if (code - code0 >= 0x20) {
+    while (idx >= 0) {
+      let da = extract_array(data, idx, /\w*\s*const\s+\w*\s*\w*\s*(\w+)_data\s*\[\]\s*\=\s*\{/)
+      idx = -1
+      if (da) {
+        let dx = extract_array(data, da.eidx, /\w*\s*const\s+\w*\s*\w*\s*(\w+)_index\s*\[\]\s*\=\s*\{/)
+        if (dx) {
+          let fo = extract_array(data, dx.eidx, /const\s+ILI9341_t3_font_t\s+(\w+)\s*\=\s*\{/, /\w+_\w+/g, '-1')
+          if (fo) {
+            idx = fo.eidx
+            document.getElementById('data').textContent = data
+            const font_name = da.fx[1]
+            let bpp = 0
+            if (fo.data[3] == 23) {
+  /*
+              let i = fo.data[4] & 0x07
+              do { ++bpp; i >>= 1 } while(i >> 1)
+  */
+              bpp = fo.data[4] & 0x03
+            }
+            let code0 = fo.data[5]
+            let code = code0
+            const font_height = fo.data[16]
+            const tt = []
+            const ff = []
+            let tg = []
+            let nx = unpack_index(dx.data, fo.data[9])
+            nx.push(da.data.length)
+            const to = nx.length - 1
+            for (let i = 0; i < to; ++i) {
+              f.init(da.data.slice(nx[i], nx[i+1]))
+              const encoding = f.uint(3)
+              const w = f.uint(fo.data[10])
+              const h = f.uint(fo.data[11])
+              const xo = f.sint(fo.data[12])
+              const yo = f.sint(fo.data[13])
+              const delta = f.uint(fo.data[14])
+              const xadv = delta
+              let bitmap = ubitmap(w, h)
+              if (ver == 1) {   // decompress
+                bitmap = font0_font1(bitmap, w, h)
+              }
+              tg.push(tsd_glyph('', code++, bpp, ver, w, h, xadv, xo, yo + h, bitmap))
+              if (code - code0 >= 0x20) {
+                ff.push(toHex00(code0))
+                tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tg.join('\n')))
+                tg = []
+                code0 = code
+              }
+            }
+            if (code > code0) {
               ff.push(toHex00(code0))
               tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tg.join('\n')))
-              tg = []
-              code0 = code
             }
-          }
-          if (code > code0) {
-            ff.push(toHex00(code0))
-            tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tg.join('\n')))
-          }
 
-          store_content(font_name, tt, ff)
-          return
+            const opt = document.createElement('option')
+            opt.innerHTML = font_name
+            opt.tt = tt;
+            opt.ff = ff
+            d_fonts.options.add(opt)
+          }
         }
       }
     }
   }
-*/
-/*
+
   // TFT_eSPI
   {
+    function urle(bp, rlens)
+    {
+      let n = 0
+      let u = 0
+      let j = 0
+
+      function append(len, d)
+      {
+        n += len
+        while (--len >= 0) {
+          u = (u << 1) | d
+          if (++j >= 8) {
+            bp.push(u)
+            u = 0
+            j = 0
+          }
+        }
+      }
+
+      for (let len of rlens) {
+        let d = 0
+        if (len & 0x80) {
+          len &= 0x7f
+          d = 1
+        }
+        append(len + 1, d)
+      }
+      return n
+    }
+
     const widtbl = extract_array(data, 0, /\w*\s*const\s+\w*\s*\w*\s*widtbl_(\w+)\s*\[(\d*)\]\s*\=(.|\n)*?\{/)
     if (widtbl) {
       const tchr = []
@@ -324,7 +427,6 @@ function proc_file()
       const font_name = widtbl.fx[1]
       let h = 0
       let baseline = 0
-      let w = 8
       switch (font_name) {
         case 'f16': h = 16, baseline = 13; break;
         case 'f32': h = 26, baseline = 19; break;
@@ -346,22 +448,26 @@ function proc_file()
           tb = []
           code0 = code
         }
-        const xadv = chr[1]
-        let bitmap = chr[2]
         let bpp = 0
+        let verr = ver
+        let bitmap = []
+        let w = 8
+        let xadv = 0
         if (font_name === 'f16') {
+          bitmap = chr[2]
           if (ver == 0) {   // compress
             bitmap = font1_font0(bitmap, w, h)
           }
+          xadv = chr[1]
         }
         else {
-          bitmap = bitmap.slice(1, bitmap.length-1)
-          bpp = 2
+          verr = 0
+          const rlens = chr[2]
+          const wh = urle(bitmap, rlens)
+          w = wh / h
+          xadv = w
         }
-
-        !!! unknown bitmap format !!!
-
-        tb.push(tsd_glyph('', code, bpp, ver, w, h, xadv, 0, baseline, bitmap))
+        tb.push(tsd_glyph('', code, bpp, verr, w, h, xadv, 0, baseline, bitmap))
       }
       if (code > code0) {
         ff.push(toHex00(code0))
@@ -372,7 +478,7 @@ function proc_file()
       return
     }
   }
-*/
+
 }
 
 function saveFile()
