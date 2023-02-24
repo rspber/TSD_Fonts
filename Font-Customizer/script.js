@@ -1090,7 +1090,8 @@ function showFontName()
     window.font_name = undefined
     window.font_size = undefined
     d.text('undefined')
-//    document.getElementById('tsdfname').textContent = null
+    document.getElementById('tsdfname').textContent = null
+    $('#result').val(null)
     p.hide()
     window.arena.innerHTML = '<em>Please import or create a font set first.</em>'
   }
