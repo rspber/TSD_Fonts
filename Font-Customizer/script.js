@@ -1020,7 +1020,7 @@ function do_create()
   let height = 28
   let utf8_pfx = ''
   let first = 0x20
-  let last = 0
+  let last = 0x3f
 
   let opt = window.sections.lastChild
   if (opt) {
