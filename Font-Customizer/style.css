@@ -1,17 +1,17 @@
 
-#glyphs div.table {
+div.table.glyph {
   user-select: none;
   margin: auto;
 }
-#glyphs div.table div.row {
+div.table.glyph div.row {
   height: 10px;
   position: relative;
 }
-#glyphs div.table div.row:first-child div.cell {
+div.table.glyph div.row:first-child div.cell {
   height: 10px;
   border-top: 1px solid lightgrey;
 }
-#glyphs div.table div.cell {
+div.table.glyph div.cell {
   border-bottom: 1px solid lightgrey;
   border-right: 1px solid lightgrey;
   width: 10px;
@@ -31,16 +31,16 @@ div.cell.x8 {
 div.cell.x4 {
   border-left: 1px solid #e8e8e8 !important;
 }
-#glyphs div.table div.cell:first-child {
+div.table.glyph div.cell:first-child {
   border-left: 1px solid lightgrey;
 }
-#glyphs div.table div.cell:hover {
+div.table.glyph div.cell:hover {
   filter: invert(0.3);
 }
-#glyphs div.table div.cell.fill.over {
+div.table.glyph div.cell.fill.over {
   filter: invert(0.1);
 }
-#glyphs div.table div.cell.dead {
+div.table.glyph div.cell.dead {
   background: #DDD !important;
 }
 
@@ -51,11 +51,11 @@ div.palette div.cell {
   height: 16px;
 }
 
-#glyphs div.palette td.cell:hover {
+div.palette td.cell:hover {
   filter: invert(0.4);
 }
 
-#glyphs div.palette td.cell {
+div.palette td.cell {
   border-bottom: 1px solid lightgrey;
   border-right: 1px solid lightgrey;
   width: 16px;

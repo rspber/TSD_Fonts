@@ -1,4 +1,4 @@
-TSD GFX Pixel font customizer 3.1
+TSD GFX Pixel font customizer 4.0
 
 ## License
 

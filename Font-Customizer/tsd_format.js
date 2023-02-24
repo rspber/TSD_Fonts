@@ -180,7 +180,7 @@ function tsd_glyph(utf8_pfx, code, bpp, ver, w, h, xadv, xo, yo, bitmap)
   return out + comment
 }
 
-function tsd_fract(font_name, font_fract, font_height, utf8_pfx, first_glyph, last_glyph, glyphs)
+function tsd_fract(fname, fract, utf8_pfx, first, last, height, glyphs)
 {
   let c1 = '0x00'
   let c2 = '0x00'
@@ -192,18 +192,18 @@ function tsd_fract(font_name, font_fract, font_height, utf8_pfx, first_glyph, la
     }
   }
   return '' +
-  'static const uint8_t ' + font_name + '_Glyphs_' + font_fract + '[] {\n' + glyphs + '\n' + '0};\n\n' +
-  'static const GFXfont ' + font_name + '_' + font_fract + ' {\n' +
-    '  ' + font_name + '_Glyphs_' + font_fract + ',\n' +
-    '  ' + c1 + ', ' + c2 + ', ' + '0' + ', ' + toHex(first_glyph) + ', ' + toHex(last_glyph) + ', ' + font_height + '\n' +
+  'static const uint8_t ' + fname + '_Glyphs_' + fract + '[] {\n' + glyphs + '\n' + '0};\n\n' +
+  'static const GFXfont ' + fname + '_' + fract + ' {\n' +
+    '  ' + fname + '_Glyphs_' + fract + ',\n' +
+    '  ' + c1 + ', ' + c2 + ', ' + '0' + ', ' + toHex(first) + ', ' + toHex(last) + ', ' + height + '\n' +
   '};\n'
 }
 
-function tsd_font(font_name, fracts)
+function tsd_font(fname, fracts)
 {
   const tt = []
   for (let f of fracts) {
-    tt.push('  &' + font_name + '_' + f + ',')
+    tt.push('  &' + fname + '_' + f + ',')
   }
-  return 'static const GFXfont* ' + font_name + '[] {\n' + tt.join('\n') + '\n  0\n};\n'
+  return 'static const GFXfont* ' + fname + '[] {\n' + tt.join('\n') + '\n  0\n};'
 }
