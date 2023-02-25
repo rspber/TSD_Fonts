@@ -612,18 +612,20 @@ function advanceLoading (percent)
   element.style.width = Math.floor(294 * percent)
 }
 
-function displayGlyphTable(glyphs)
+function displayGlyphTable(ft)
 {
-  const l = glyphs.children.length
-  for (let i = 0; i < glyphs.children.length; ++i) {
+  const l = ft.glyphs.length
+  for (let i = 0; i < ft.glyphs.length; ++i) {
 
-    let t = glyphs.children[i]
+    let glyph = ft.glyphs[i]
     let adv = (i + 1) / l
 
     setTimeout(
       ()=>{
         advanceLoading(0.2 + 0.8 * adv)
-        rebuildGlyphTable(t)
+        const div = makeGlyphTable(glyph)
+        rebuildGlyphTable(div.t)
+        append(ft.div, div)
         if (adv === 1) {
           $('#loader').hide()
         }
@@ -637,13 +639,32 @@ function getGlyphsTable(ft)
 {
   if (!ft.div) {
     ft.div = element('div', 'ui glyph-grid')
-    for (let glyph of ft.glyphs) {
-      const div = makeGlyphTable(glyph)
-      rebuildGlyphTable(div.t)
-      append(ft.div, div)
-    }
+    advanceLoading(0)
+    $('#loader').fadeIn(function() {
+      displayGlyphTable(ft)
+    })
   }
   return ft.div
+}
+
+function do_select_fract()
+{
+  let sect = window.sections
+  let opt = sect.selectedOptions[0]
+  window.arena.innerHTML = null
+  if (opt.ft) {
+    append(window.arena, getGlyphsTable(opt.ft))
+  }
+}
+
+function add_font_sect(ft)
+{
+  if (!window.sections.options.length) {
+    window.sections.innerHTML = '<option>select section</option>'
+  }
+  const opt = element('option', '', font_name + '_' + ft.fract)
+  opt.ft = ft
+  window.sections.options.add(opt)
 }
 
 function load_err(msg)
@@ -773,16 +794,6 @@ function extractSection(found1, data)
   return ft
 }
 
-function add_font_sect(ft)
-{
-  if (!window.sections.options.length) {
-    window.sections.innerHTML = '<option>select section</option>'
-  }
-  const opt = element('option', '', font_name + '_' + ft.fract)
-  opt.ft = ft
-  window.sections.options.add(opt)
-}
-
 function do_import()
 {
   let data = $('#source').val()
@@ -866,16 +877,6 @@ function createGlyphs()
   add_font_sect(ft)
 
   showFontName()
-}
-
-function do_select_fract()
-{
-  let sect = window.sections
-  let opt = sect.selectedOptions[0]
-  window.arena.innerHTML = null
-  if (opt.ft) {
-    append(window.arena, getGlyphsTable(opt.ft))
-  }
 }
 
 function do_msg(msg)
@@ -1047,14 +1048,6 @@ function do_create()
     closable: false,
     onApprove: createGlyphs
   }).modal('show')
-}
-
-function _do_import()
-{
-  advanceLoading(0)
-  $('#loader').fadeIn(function() {
-    extractFonts()
-  })
 }
 
 function do_export()
