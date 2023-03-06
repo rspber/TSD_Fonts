@@ -202,7 +202,7 @@ function proc_file()
   }
 */
 
-  // ILI9341_fonts
+  // ILI9341_t3_font_t: ILI9341_fonts
   {
     function unpack_index(bitnx, bits_index)
     {
