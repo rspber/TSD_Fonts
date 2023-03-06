@@ -99,14 +99,14 @@ function proc_file()
             tg.push(tsd_glyph('', code++, 0, ver, w, h, xadv, xo, yo, bitmap))
             if (code - code0 >= 0x20) {
               ff.push(toHex00(code0))
-              tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tg.join('\n')))
+              tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tg.join('\n')))
               tg = []
               code0 = code
             }
           }
           if (code > code0) {
             ff.push(toHex00(code0))
-            tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tg.join('\n')))
+            tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tg.join('\n')))
           }
 
           store_content(font_name, tt, ff)
@@ -143,14 +143,14 @@ function proc_file()
           tb.push(tsd_glyph('', code++, 0, ver, w, h, w, 0, font_height - 6, bitmap))
           if (code - code0 >= 0x20) {
             ff.push(toHex00(code0))
-            tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tb.join('\n')))
+            tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tb.join('\n')))
             tb = []
             code0 = code
           }
         }
         if (code > code0) {
           ff.push(toHex00(code0))
-          tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tb.join('\n')))
+          tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tb.join('\n')))
         }
 
         d_fonts.innerHTML = '<option>' + font_name + '</option>'
@@ -184,14 +184,14 @@ function proc_file()
           tb.push(tsd_glyph('', code++, 0, ver, w, h, w, 0, 0, bitmap))
           if (code - code0 >= 0x20) {
             ff.push(toHex00(code0))
-            tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tb.join('\n')))
+            tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tb.join('\n')))
             tb = []
             code0 = code
           }
         }
         if (code > code0) {
           ff.push(toHex00(code0))
-          tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tb.join('\n')))
+          tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tb.join('\n')))
         }
 
         d_fonts.innerHTML = '<option>' + font_name + '</option>'
@@ -202,7 +202,7 @@ function proc_file()
   }
 */
 
-  // ILI9341_t3_font_t
+  // ILI9341_fonts
   {
     function unpack_index(bitnx, bits_index)
     {
@@ -355,14 +355,14 @@ function proc_file()
               tg.push(tsd_glyph('', code++, bpp, ver, w, h, xadv, xo, yo + h, bitmap))
               if (code - code0 >= 0x20) {
                 ff.push(toHex00(code0))
-                tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tg.join('\n')))
+                tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tg.join('\n')))
                 tg = []
                 code0 = code
               }
             }
             if (code > code0) {
               ff.push(toHex00(code0))
-              tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tg.join('\n')))
+              tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tg.join('\n')))
             }
 
             const opt = document.createElement('option')
@@ -444,7 +444,7 @@ function proc_file()
         code = chr[0]
         if (code - code0 >= 0x20) {
           ff.push(toHex00(code0))
-          tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tb.join('\n')))
+          tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tb.join('\n')))
           tb = []
           code0 = code
         }
@@ -471,7 +471,7 @@ function proc_file()
       }
       if (code > code0) {
         ff.push(toHex00(code0))
-        tt.push(tsd_fract(font_name, toHex00(code0), font_height, '', code0, code-1, tb.join('\n')))
+        tt.push(tsd_fract(font_name, toHex00(code0), '', code0, code-1, font_height, tb.join('\n')))
       }
 
       store_content(font_name, tt, ff)

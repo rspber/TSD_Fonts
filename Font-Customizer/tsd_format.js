@@ -131,8 +131,13 @@ function unicodevalue(pfx, code) {
 }
 
 function ucharvalue(pfx, code) {
-  let u = unicode(pfx, code)
-  return isNaN(u) ? 'unreachable' : u < 0 ? '' : String.fromCharCode(u)
+  if (code < 0x20) {
+    return toHex(code)
+  }
+  else {
+    let u = unicode(pfx, code)
+    return isNaN(u) ? 'unreachable' : u < 0 ? '' : String.fromCharCode(u)
+  }
 }
 
 function fillUCodeAndUtf8(pfx, charInput){
