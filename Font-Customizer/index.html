@@ -1,0 +1,183 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TSD Font Customizer 4.0</title>
+  <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+  <script src="jstc.js"></script>
+  <script src="script.js"></script>
+  <script src="tsd_tabxy.js"></script>
+  <script src="tsd_format.js"></script>
+  <style>
+    html, body {
+      margin: 0 10px;
+    }
+    textarea {
+      font-family: "Courier", monotype;
+      font-size: 0.9em !important;
+      height: 20em !important;
+    }
+    .explanation ul {
+      list-style-type: circle;
+      margin: 0;
+      padding-left: 14px;
+    }
+    .explanation h5 {
+      margin-bottom: 4px;
+      margin-top: 4px;
+    }
+    p {   /* break ugly semantic css */
+      margin: 5px 0px 2px;
+    }
+    #loader {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      font-weight: bold;
+      font-size: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+    }
+    .advance-wrapper {
+      width: 300px;
+      position: relative;
+      border: 1px solid lightgray;
+      height: 30px;
+      margin-bottom: 20px;
+    }
+    .advance {
+      opacity: 0.7;
+      background: white;
+      width: 10px;
+      height: 24px;
+      margin: 2px;
+    }
+    .glyph-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      justify-content: center;
+    }
+    .glyph-grid > div {
+      margin: 1rem;
+      box-shadow: 3px 3px 8px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body onload="on_load()">
+  <span style="display: flex;"><h1 class="ui header" style="margin: 5px; line-height: 1;">TSD_GFX Pixel font customizer</h1><h4 class="ui header" style="margin: 5px;">4.0</h4></span>
+  <p>
+    <em>Created by <a href="https://github.com/rspber">rspber</a>,
+    based on <a href="https://github.com/tchapi/Adafruit-GFX-Font-Customiser">tchapi</a> font customizer.</em>
+  </p>
+
+  <div class="ui divider"></div>
+
+  <div class="ui grid">
+    <div class="eight wide column">
+      <div class="ui teal segment">
+        <input type="file" accept=".h" id="load-file" onclick="clr_input_file()" style="margin: 0 1em;">Choose tsd font file</input>
+        <div class="ui form">
+          <div class="field">
+            <label>Extract fonts from source</label>
+            <textarea id="source"></textarea>
+          </div>
+            <button class="ui button teal" onclick="do_import()"><i class="icon upload"></i> Import </button>
+            <button class="ui button red right floated" onclick="do_reset()"><i class="icon undo"></i> Reset</button>
+            <button class="ui button blue right floated" onclick="do_create()"><i class="icon file outline"></i> Create a new font section</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="eight wide column">
+      <div class="ui green segment" id="resultWrapper">
+        <span><button id="save-file" onclick="saveFile()" style="margin: 0 1em;">Download file</button><a id="tsdfname">No file to download</a></span>
+        <div class="ui form">
+          <div class="field">
+            <label>Output</label>
+            <textarea onclick="this.focus();this.select()" id="result" readonly></textarea>
+          </div>
+          <div style="display: flex;">
+            <div style="width: 50%;"></div>
+            <label>Bitmaps compression</label>
+            <select id="datacompr" style="margin-left: 10px; width: auto; padding: 2px;">
+              <option value="">no change</option>
+              <option value="0">compress</option>
+              <option value="1">no compress</option>
+            </select>
+          </div>
+          <button class="ui button green" onclick="do_export()"><i class="icon download"></i> Export </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ui divider"></div>
+
+  <h2 class="ui header" style="margin: 5px;">How to use it</h2>
+  <div class="ui grid">
+    <div class="five wide column">
+      <div class="ui explanation">
+        <h5>Importing or creating a font file:</h5>
+        You can:
+        <ul>
+          <li>Load a font file or paste it from clipboard to textarea above</li>
+          <li>Import a font from textarea above</li>
+          <li>Create a new font section (repeating it for next sections)</li>
+        </ul>
+        <br/>
+        <p>Dividing font for sections is intended for easy access and executing it.</p>
+        <p>For utf8 chars two or more bytes long, sections are imposed in advance and consists of maximum 64 characters from ending code 0x80 to 0xbf.</p>
+      </div>
+    </div>
+    <div class="eleven wide column">
+      <div class="ui explanation">
+        <h5>Editing glyphs:</h5>
+        Glyphs can be edited individually. You can:
+        <ul>
+          <li>Select a section to edit</li>
+          <li>Enable or disable the glyph</li>
+          <li>Edit each pixel of the glyph</li>
+          <li>Edit parameters describes the glyph (except the font name and height which are permanent)</li>
+        </ul>
+        <h5>When exporting, you can :</h5>
+        <ul>
+          <li>Disable individual characters, they will be skipped.</li>
+        </ul>
+        <p>regarding the Adafruit format, yOffset is saved as positive.</p>
+        <p>The TSD font format is prepared to handle multiple font sections in a single TSD_<b>name</b>_<b>size</b>pt.h header file.
+        <br>These sections should be disjoint and not necessarily continuous both inside and outside, so during export disabled fonts are simply skipped. After font import, missing fonts can by reactivated.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ui divider"></div>
+  <div class="ui grid" style="display: none;">
+    <div class="three wide column">
+      <h2 class="ui header">Font: <em class="fontname">unknown</em></h2>
+    </div>
+    <div class="thirteen wide column">
+      <select id="sections" onclick="do_select_fract()"></select>
+    </div>
+  </div>
+
+  <div id="loader">
+    <div class="advance-wrapper"><div class="advance"></div></div>
+    <span>Loading and extracting font ...</span>
+  </div>
+  <div id="arena"/>
+</body>
+</html>

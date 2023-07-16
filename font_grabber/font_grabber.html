@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TSD Font Grabber 1.0</title>
+    <script src="tsd_fontc.js"></script>
+    <script src="tsd_format.js"></script>
+  </head>
+  <body style="height: 100%;">
+    <div style="display: flex; flex-direction: row;">
+      <div style="width:50% !important; margin: 1em;">
+        <span>
+          <input type="file" accept=".h,.c" id="load" onclick="clr_input_file()" style="margin: 0 1em;">Choose font file to convert to tsd font</input>
+          <span  style="float: right;"><input type="checkbox" onclick="setver(event)">Use bitmaps compression (check before choose file)</input></span>
+        </span>
+        <textarea id="data" readonly onclick="this.focus();this.select()" style="width:100%; height: 50em; max-height: 100%;"></textarea>
+      </div>
+      <div style="width:50% !important; margin: 1em;">
+        <span>
+          <button id="save" onclick="saveFile()" style="margin: 0 1em;">Download file</button>
+          <a id="tsdfname">No file to download</a>
+          <select id="fonts" onchange="fonts_select(event)" style="float: right">
+            <option value="">no items to select</option>
+          </select>
+        </span>
+        <textarea id="result" readonly onclick="this.focus();this.select()" style="width:100%; height: 50em; max-height: 100%;"></textarea>
+      </div>
+    </div>
+    <script src="font_grabber.js"></script>
+  </body>
+</html>
