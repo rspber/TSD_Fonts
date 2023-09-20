@@ -21,7 +21,7 @@
 
   and place them in the project jars folder
  
-6. In eclise: import project
+6. In eclipse: import project
 
 7. In eclipse you should see:
 
