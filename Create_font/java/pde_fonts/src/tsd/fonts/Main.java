@@ -16,12 +16,14 @@
 4. Download the 4.0.1 version of processing, maybe others will as well
 
 5. Target the following jars: 
- 
+ -
   core.jar, flatlaf.jar, gluegen-rt.jar, jna.jar, jna-platform.jar, jogl-all.jar, pde.jar
 
   and place them in the project jars folder
  
-6. In eclipse you should see:
+6. In eclise: import project
+
+7. In eclipse you should see:
 
   Project / Properties
     Java Build Path
