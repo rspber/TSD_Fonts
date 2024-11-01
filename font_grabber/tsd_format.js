@@ -198,7 +198,7 @@ function tsd_fract(fname, fract, utf8_pfx, first, last, height, glyphs)
   }
   return '' +
   'static const uint8_t ' + fname + '_Glyphs_' + fract + '[] {\n' + glyphs + '\n' + '0};\n\n' +
-  'static const GFXfont ' + fname + '_' + fract + ' {\n' +
+  'static const TSD_GFXfont ' + fname + '_' + fract + ' {\n' +
     '  ' + fname + '_Glyphs_' + fract + ',\n' +
     '  ' + c1 + ', ' + c2 + ', ' + '0' + ', ' + toHex(first) + ', ' + toHex(last) + ', ' + height + '\n' +
   '};\n'
@@ -210,5 +210,5 @@ function tsd_font(fname, fracts)
   for (let f of fracts) {
     tt.push('  &' + fname + '_' + f + ',')
   }
-  return 'static const GFXfont* ' + fname + '[] {\n' + tt.join('\n') + '\n  0\n};'
+  return 'static const TSD_GFXfont* ' + fname + '[] {\n' + tt.join('\n') + '\n  0\n};'
 }

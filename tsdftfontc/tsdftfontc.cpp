@@ -270,7 +270,7 @@ int page_end(const int z, const int w, const int first, const int last)
 {
     printf("0};\n\n");
 
-    printf("static const GFXfont %s_%s {\n", fontName, fract);
+    printf("static const TSD_GFXfont %s_%s {\n", fontName, fract);
     printf("  %s_Glyphs_%s,\n", fontName, fract);
     int16_t h = face->size->metrics.height;
     // No face height info, assume fixed width and get from a glyph.
@@ -283,7 +283,7 @@ int page_end(const int z, const int w, const int first, const int last)
 
 void print_footer(int totsize)
 {
-  printf("static const GFXfont* %s[] {\n", fontName);
+  printf("static const TSD_GFXfont* %s[] {\n", fontName);
   for (int i = 0; i < THN; ++i) {
     printf("  &%s_%s,\n", fontName, TH[i]);
   }

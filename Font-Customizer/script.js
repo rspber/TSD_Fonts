@@ -710,8 +710,12 @@ function extractSection(found1, data)
   const font_name_fract = font_name + '_' + ft.fract
   var t2
   {
-    const re2 = new RegExp('static\\s+const\\s+GFXfont\\s' + font_name_fract + '\\s*\\{')
-    const found2 = re2.exec(data)
+    let re2 = new RegExp('static\\s+const\\s+TSD_GFXfont\\s' + font_name_fract + '\\s*\\{')
+    let found2 = re2.exec(data)
+    if (!found2) {
+      re2 = new RegExp('static\\s+const\\s+GFXfont\\s' + font_name_fract + '\\s*\\{')
+      found2 = re2.exec(data)
+    }
     if (found2) {
       let i = found2.index + found2[0].length
       let j = data.indexOf('};', i)
@@ -721,7 +725,7 @@ function extractSection(found1, data)
       t2 = eval( '[' + tx + ']')
     }
     else {
-      load_err('No ending section: \'static const GFXfont ' + font_name_fract + ' {\' found')
+      load_err('No ending section: \'static const TSD_GFXfont ' + font_name_fract + ' {\' found')
       return;
     }
   }

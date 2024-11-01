@@ -1,10 +1,3 @@
-<!--
-<p dir="auto">
-  <a href="https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md">
-    <img src="https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct.svg" alt="SWUbanner" style="max-width: 100%;">
-  </a>
-</p>
--->
 # TSD_Fonts
 
   * A set of tools for acquiring, producing and manipulating fonts for TSDesktop: https://github.com/rspber/tsdesktop.

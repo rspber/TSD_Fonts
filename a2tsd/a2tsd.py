@@ -59,7 +59,7 @@ def proc_file(f, lines, name):
 	glyphs = []
 	font = []
 
-	n = 0
+	fname = None
 	for s in lines:
 		i = 0
 		while True:
@@ -76,6 +76,7 @@ def proc_file(f, lines, name):
 		if mode == -1:
 			result = re.search(r"const\s+uint8_t\s+(\w+)Bitmaps\[\]\s*\w*\s*\=\s*\{", s)
 			if result:
+				fname = result.group(1)
 #				print(s)
 				mode = 0
 				continue
@@ -90,9 +91,8 @@ def proc_file(f, lines, name):
 		if mode == -1:
 			result = re.search(r"const\s+GFXfont\s+(\w+)\s*\w*\s*\=\s*\{", s)
 			if result:
-#				print(s)
+				font.append(s.strip())
 				mode = 2
-				n = 0;
 				continue
 
 		if mode == 0:
@@ -110,27 +110,38 @@ def proc_file(f, lines, name):
 			glyphs.append(s)
 
 		if mode == 2:
-			n = n + 1;
-			if n < 3:
-				continue
+			font.append(s.strip())
 			i = s.find("};")
 			if i >= 0:
-				s = s[:i]
 				mode = -1
-			font.append(s)
 
 	s = ''.join(bitmaps)
-#	print(s)
+	#print("bitmaps")
+	#print(s)
 	bi = eval( '[' + s + ']')
 	s = ''.join(glyphs)
 	s = s.replace('{', '[')
 	s = s.replace('}', ']')
-#	print(s)
+	#print("glyphs")
+	#print(s)
 	gl = eval( '[' + s + ']')
+	#print("gl")
+	#print(gl)
 	s = ''.join(font)
-#	print(s)
-	fo = eval( '[' + s + ']')
-	dump_font_file(f, bi, gl, fo[2], name)
+	print("font")
+	print(s)
+	s1 = fname + 'Glyphs'
+	j = s.find('};')
+	i = s.find(s1)
+	if i > 0:
+		s = s[i + len(s1)+1 : j]
+		fo = eval( '[' + s + ']')
+		print("fo")
+		print(fo)
+		le = fo[2]
+	else:
+		le = 12
+	dump_font_file(f, bi, gl, le, name)
 
 def do_file(olddir, newdir, fname):
 	print(fname)

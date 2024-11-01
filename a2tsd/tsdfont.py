@@ -87,10 +87,10 @@ def print_glyphs_header(f, name, code0):
 
 def print_glyphs_footer(f, name, code0, code, yadv):
 	f.write('0};\n\n')
-	f.write('static const GFXfont %s_%02X {\n  %s_Glyphs_%02X,\n  0x00, 0x00, 0, 0x%02X, 0x%02X, %d\n};\n\n' % (name, code0, name, code0, code0, code-1, yadv))
+	f.write('static const TSD_GFXfont %s_%02X {\n  %s_Glyphs_%02X,\n  0x00, 0x00, 0, 0x%02X, 0x%02X, %d\n};\n\n' % (name, code0, name, code0, code0, code-1, yadv))
 
 def print_fonts_list(f, name, tt):
-	f.write('static const GFXfont* %s[] {\n' % name)
+	f.write('static const TSD_GFXfont* %s[] {\n' % name)
 	for c0 in tt:
 		f.write('  &%s_%02X,\n' % (name, c0))
 	f.write('  0\n};\n\n')

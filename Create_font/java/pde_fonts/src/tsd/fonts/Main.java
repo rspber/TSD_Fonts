@@ -211,7 +211,7 @@ class ToFile {
   {
     writer.write("0};\n\n");
 
-    writer.write("static const GFXfont %s_%s {\n", fontName, fract);
+    writer.write("static const TSD_GFXfont %s_%s {\n", fontName, fract);
     writer.write("  %s_Glyphs_%s,\n", fontName, fract);
     int c1 = z > 0 ? z : w;
     int c2 = z > 0 ? w : 0;
@@ -220,7 +220,7 @@ class ToFile {
 
   public void run(PFont font) throws IOException
   {
-    footer.write("static const GFXfont* %s[] {\n", fontName);
+    footer.write("static const TSD_GFXfont* %s[] {\n", fontName);
 
     short[] buf = new short[8];
     
